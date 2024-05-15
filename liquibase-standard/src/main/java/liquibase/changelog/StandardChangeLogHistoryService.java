@@ -4,6 +4,10 @@ import liquibase.*;
 import liquibase.change.Change;
 import liquibase.change.CheckSum;
 import liquibase.change.ColumnConfig;
+import liquibase.command.CommandFactory;
+import liquibase.command.CommandStep;
+import liquibase.command.core.AbstractUpdateCommandStep;
+import liquibase.command.core.UpdateCommandStep;
 import liquibase.database.Database;
 import liquibase.database.core.DB2Database;
 import liquibase.database.core.MSSQLDatabase;
@@ -283,6 +287,13 @@ public class StandardChangeLogHistoryService extends AbstractChangeLogHistorySer
         if (!statementsToExecute.isEmpty()) {
             //reset the cache if there was a change to the table. Especially catches things like md5 changes which might have been updated but would still be wrong in the cache
             this.ranChangeSetList = null;
+            List<CommandStep> pipeline = CommandFactory.getInstance().getCommandDefinition(UpdateCommandStep.COMMAND_NAME).getPipeline();
+            for (CommandStep commandStep : pipeline) {
+                if (commandStep instanceof AbstractUpdateCommandStep) {
+                    AbstractUpdateCommandStep abstractUpdateCommandStep = (AbstractUpdateCommandStep) commandStep;
+                    abstractUpdateCommandStep.clearUpToDateFastCheckCache();
+                }
+            }
         }
         serviceInitialized = true;
     }

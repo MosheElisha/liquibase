@@ -330,6 +330,10 @@ public abstract class AbstractUpdateCommandStep extends AbstractCommandStep impl
         return false;
     }
 
+    public void clearUpToDateFastCheckCache() {
+        upToDateFastCheck.clear();
+    }
+
     public void setFastCheckEnabled(boolean fastCheckEnabled) {
         isFastCheckEnabled = fastCheckEnabled;
     }
